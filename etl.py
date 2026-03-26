@@ -14,6 +14,25 @@ def calcular_kpi_total_vendas(df: pd.DataFrame) -> pd.DataFrame:
     df_total_vendas["Total"] = df["Quantidade"] * df["Venda"]
     return df_total_vendas
 
+def salvar_parquet_por_data(df: pd.DataFrame, path_saida: str):
+    os.makedirs(path_saida, exist_ok=True)
+
+    # Agrupa por data
+    df["Data"] = pd.to_datetime(df["Data"])
+    for data, df_dia in df.groupby(df["Data"].dt.date):
+        data_str = pd.to_datetime(data).strftime("%Y%m%d")
+
+        nome_arquivo = f"{path_saida}_{data_str}.parquet"
+
+        df_dia.to_parquet(
+            nome_arquivo,
+            engine="pyarrow",
+            index=False
+        )
+
+        print(f"Arquivo: {nome_arquivo} salvo com sucesso!")      
+    return 
+
 def carregar_dados(df: pd.DataFrame, caminho: str, tipo_arq: list[str]) -> None:
     
     for tipo in tipo_arq:
@@ -22,9 +41,7 @@ def carregar_dados(df: pd.DataFrame, caminho: str, tipo_arq: list[str]) -> None:
         elif tipo == "json":
             df.to_json(caminho + "." + tipo, orient="records")   
         elif tipo == "parquet":
-            df.to_parquet(caminho + "." + tipo, index=False)
-
-        print(f"Arquivo: `{caminho + "." + tipo}` salvo com sucesso!")      
+            salvar_parquet_por_data(df, caminho)
 
     return None
 
