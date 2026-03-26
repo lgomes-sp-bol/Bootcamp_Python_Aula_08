@@ -38,8 +38,10 @@ def carregar_dados(df: pd.DataFrame, caminho: str, tipo_arq: list[str]) -> None:
     for tipo in tipo_arq:
         if tipo == "csv":
             df.to_csv(caminho + "." + tipo, index=False)
+            print(f"Arquivo: {caminho + "." + tipo} salvo com sucesso!")      
         elif tipo == "json":
             df.to_json(caminho + "." + tipo, orient="records")   
+            print(f"Arquivo: {caminho + "." + tipo} salvo com sucesso!")      
         elif tipo == "parquet":
             salvar_parquet_por_data(df, caminho)
 
